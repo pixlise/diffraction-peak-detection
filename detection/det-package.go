@@ -35,8 +35,8 @@ import (
 	"io/ioutil"
 	"math"
 
-	"gitlab.com/pixlise/diffraction-peak-detection/diffraction"
-	"gitlab.com/pixlise/quant-converter/experiment"
+	"github.com/pixlise/diffraction-peak-detection/diffraction"
+	"github.com/pixlise/quant-converter/experiment"
 	"google.golang.org/protobuf/proto"
 )
 
