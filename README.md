@@ -1,6 +1,8 @@
+[![DOI](https://zenodo.org/badge/520610317.svg)](https://zenodo.org/badge/latestdoi/520610317)
+
 # Diffraction Peak Detection
 
-Detects diffraction peaks in spectral data
+Detects diffraction peaks in X-ray fluorescence (XRF) spectroscopy data
 
 ## Run from command line
 
