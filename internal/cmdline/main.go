@@ -35,7 +35,7 @@ import (
 	"os"
 	"sort"
 
-	"github.com/pixlise/diffraction-peak-detection/detection"
+	"github.com/pixlise/diffraction-peak-detection/diffractionDetector"
 )
 
 func main() {
@@ -47,7 +47,7 @@ func main() {
 	flag.Parse()
 
 	if nil != loadPath && *loadPath != "" {
-		peaksParsed, err := detection.ParseDiffractionProtoBuf(*loadPath)
+		peaksParsed, err := diffractionDetector.ParseDiffractionProtoBuf(*loadPath)
 		if err == nil {
 			fmt.Println(peaksParsed.Title)
 			fmt.Printf("%v Locations with Peaks found\n", len(peaksParsed.Locations))
@@ -64,7 +64,7 @@ func main() {
 		}
 
 	} else {
-		protoParsed, err := detection.ParseDatasetProtobuf(*argPath)
+		protoParsed, err := diffractionDetector.ParseDatasetProtobuf(*argPath)
 
 		if err != nil {
 			fmt.Printf("Failed to open file \"%v\": \"%v\"\n", *argPath, err)
@@ -74,7 +74,7 @@ func main() {
 		fmt.Println(protoParsed.Title)
 
 		fmt.Println("Scanning dataset for diffraction peaks")
-		datasetPeaks, err := detection.ScanDataset(protoParsed)
+		datasetPeaks, err := diffractionDetector.ScanDataset(protoParsed)
 		if err == nil {
 			fmt.Println("Completed scan successfully")
 		} else {
@@ -115,8 +115,8 @@ func main() {
 
 		if nil != savePath && *savePath != "" {
 			fmt.Println("Saving binary file")
-			diffractionPB := detection.BuildDiffractionProtobuf(protoParsed, datasetPeaks)
-			err := detection.SaveDiffractionProtobuf(diffractionPB, *savePath)
+			diffractionPB := diffractionDetector.BuildDiffractionProtobuf(protoParsed, datasetPeaks)
+			err := diffractionDetector.SaveDiffractionProtobuf(diffractionPB, *savePath)
 			if err == nil {
 				fmt.Println("File saved successfully")
 			} else {
