@@ -35,7 +35,7 @@ import (
 	"os"
 	"sort"
 
-	"github.com/pixlise/diffraction-peak-detection/diffractionDetector"
+	diffractionDetector "github.com/pixlise/diffraction-peak-detection/detection"
 )
 
 func main() {
