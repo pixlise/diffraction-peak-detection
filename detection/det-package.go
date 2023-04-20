@@ -27,7 +27,6 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-
 package detection
 
 import (
@@ -35,20 +34,19 @@ import (
 	"io/ioutil"
 	"math"
 
-	"github.com/pixlise/diffraction-peak-detection/diffraction"
-	"github.com/pixlise/quant-converter/experiment"
+	protos "github.com/pixlise/core/v2/generated-protos"
 	"google.golang.org/protobuf/proto"
 )
 
 // Go avoids semicolons, has fixed {} rules (opening { not allowed on its own line), multiple return values
-func ParseDatasetProtobuf(path string) (*experiment.Experiment, error) {
+func ParseDatasetProtobuf(path string) (*protos.Experiment, error) {
 	// Open the dataset
 	datasetData, err := ioutil.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
 
-	datasetPB := &experiment.Experiment{}
+	datasetPB := &protos.Experiment{}
 	err = proto.Unmarshal(datasetData, datasetPB)
 	if err != nil {
 		return nil, err
@@ -56,8 +54,8 @@ func ParseDatasetProtobuf(path string) (*experiment.Experiment, error) {
 	return datasetPB, nil
 }
 
-func BuildDiffractionProtobuf(dataset *experiment.Experiment, diffractionData map[string][]DiffractionPeak) *diffraction.Diffraction {
-	diffractionPB := &diffraction.Diffraction{}
+func BuildDiffractionProtobuf(dataset *protos.Experiment, diffractionData map[string][]DiffractionPeak) *protos.Diffraction {
+	diffractionPB := &protos.Diffraction{}
 
 	diffractionPB.TargetId = dataset.TargetId
 	diffractionPB.DriveId = dataset.DriveId
@@ -70,9 +68,9 @@ func BuildDiffractionProtobuf(dataset *experiment.Experiment, diffractionData ma
 	diffractionPB.Sclk = dataset.Sclk
 
 	for loc := range diffractionData {
-		peakData := make([]*diffraction.Diffraction_Location_Peak, len(diffractionData[loc]))
+		peakData := make([]*protos.Diffraction_Location_Peak, len(diffractionData[loc]))
 		for peakID, peak := range diffractionData[loc] {
-			peakPB := diffraction.Diffraction_Location_Peak{}
+			peakPB := protos.Diffraction_Location_Peak{}
 			peakPB.PeakChannel = int32(peak.PeakChannel)
 			peakPB.EffectSize = float32(peak.EffectSize)
 			peakPB.BaselineVariation = float32(peak.BaselineVariation)
@@ -82,7 +80,7 @@ func BuildDiffractionProtobuf(dataset *experiment.Experiment, diffractionData ma
 
 			peakData[peakID] = &peakPB
 		}
-		locationData := diffraction.Diffraction_Location{}
+		locationData := protos.Diffraction_Location{}
 		locationData.Id = loc
 		locationData.Peaks = peakData
 		diffractionPB.Locations = append(diffractionPB.Locations, &locationData)
@@ -91,7 +89,7 @@ func BuildDiffractionProtobuf(dataset *experiment.Experiment, diffractionData ma
 	return diffractionPB
 }
 
-func SaveDiffractionProtobuf(diffractionPB *diffraction.Diffraction, fname string) error {
+func SaveDiffractionProtobuf(diffractionPB *protos.Diffraction, fname string) error {
 	out, err := proto.Marshal(diffractionPB)
 	if err != nil {
 		return err
@@ -103,13 +101,13 @@ func SaveDiffractionProtobuf(diffractionPB *diffraction.Diffraction, fname strin
 	return nil
 }
 
-func ParseDiffractionProtoBuf(path string) (*diffraction.Diffraction, error) {
+func ParseDiffractionProtoBuf(path string) (*protos.Diffraction, error) {
 	diffractionData, err := ioutil.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
 
-	diffractionPB := &diffraction.Diffraction{}
+	diffractionPB := &protos.Diffraction{}
 	err = proto.Unmarshal(diffractionData, diffractionPB)
 	if err != nil {
 		return nil, err
@@ -117,7 +115,7 @@ func ParseDiffractionProtoBuf(path string) (*diffraction.Diffraction, error) {
 	return diffractionPB, nil
 }
 
-func ScanDataset(dataset *experiment.Experiment) (map[string][]DiffractionPeak, error) {
+func ScanDataset(dataset *protos.Experiment) (map[string][]DiffractionPeak, error) {
 	datasetDiffractionPeaksMap := make(map[string][]DiffractionPeak)
 	for loc := range dataset.Locations {
 		if len(dataset.Locations[loc].Detectors) == 2 { // this check is to avoid dwell/bulksum spectra
@@ -279,10 +277,10 @@ func pruneNeighbors(potentialPeaks []DiffractionPeak, boundary int) []Diffractio
 			skip = true
 		}
 	}
+
 	if skip {
 		return pruneNeighbors(peaks, boundary)
 	}
 
 	return peaks
-
 }
