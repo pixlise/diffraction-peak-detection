@@ -1,4 +1,4 @@
-module github.com/pixlise/diffraction-peak-detection
+module github.com/pixlise/diffraction-peak-detection/v2
 
 go 1.18
 
