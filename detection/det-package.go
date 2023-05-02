@@ -77,6 +77,7 @@ func BuildDiffractionProtobuf(dataset *protos.Experiment, diffractionData map[st
 			peakPB.GlobalDifference = float32(peak.GlobalDifference)
 			peakPB.DifferenceSigma = float32(peak.DifferenceSigma)
 			peakPB.PeakHeight = float32(peak.PeakHeight)
+			peakPB.Detector = peak.Detector
 
 			peakData[peakID] = &peakPB
 		}
@@ -143,6 +144,7 @@ type DiffractionPeak struct {
 	GlobalDifference  float64
 	DifferenceSigma   float64
 	PeakHeight        float64
+	Detector          string
 }
 
 func DecodeZeroRun(encodedSpectrum []int32) []int32 {
@@ -206,17 +208,35 @@ func ScanSpectra(a []int32, b []int32) ([]DiffractionPeak, error) {
 
 		avgCounts := 0.5 * (meanA + meanB)
 
+		detector := ""
+
 		baselineVariation := 0.0
 		if meanA >= meanB {
 			meanLogB := meanFloats(logB[i : i+2*halfResolution])
 			baselineVariation = stdFloats(logB[i:i+2*halfResolution], meanLogB) / meanLogB
+
+			if meanA > meanB {
+				detector = "A"
+			} // Otherwise it's blank!
 		} else {
 			meanLogA := meanFloats(logA[i : i+2*halfResolution])
 			baselineVariation = stdFloats(logA[i:i+2*halfResolution], meanLogA) / meanLogA
+			detector = "B"
 		}
 
 		if avgCounts >= minAvgCount && tStatistic >= minEffect && peakHeight >= minHeight {
-			potentialPeaks = append(potentialPeaks, DiffractionPeak{i + halfResolution, tStatistic, baselineVariation, math.Abs(normalizationFactor), stdDiff, peakHeight})
+			potentialPeaks = append(
+				potentialPeaks,
+				DiffractionPeak{
+					i + halfResolution,
+					tStatistic,
+					baselineVariation,
+					math.Abs(normalizationFactor),
+					stdDiff,
+					peakHeight,
+					detector,
+				},
+			)
 		}
 
 	}
