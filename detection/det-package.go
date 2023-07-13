@@ -170,7 +170,7 @@ func ScanSpectra(a []int32, b []int32) ([]DiffractionPeak, error) {
 	const halfResolution = 15
 	const minAvgCount = 2.0
 	const minEffect = 6.0
-	const minChannel = 500
+	const minChannel = 100
 	const maxChannel = 2000
 	const minHeight = 0.1
 
